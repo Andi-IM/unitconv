@@ -1,4 +1,5 @@
 mod domain;
+use crate::domain::records::ConversionRecord;
 use crate::domain::units::Unit;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -28,6 +29,8 @@ pub enum Commands {
         #[arg(long)]
         value: f64,
     },
+    /// Melihat riwayat konversi
+    History,
 }
 
 pub fn run(cli: Cli) -> Result<()> {
@@ -36,6 +39,10 @@ pub fn run(cli: Cli) -> Result<()> {
             Ok(result) => println!("{result}"),
             Err(e) => eprintln!("Error: {e}"),
         },
+        Commands::History => {
+            let history = ConversionRecord::load_history()?;
+            println!("{history:?}");
+        }
     }
     Ok(())
 }
