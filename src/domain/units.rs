@@ -29,6 +29,16 @@ impl fmt::Display for Unit {
 }
 
 impl Unit {
+    /// Converts a string input to a Unit variant, case-insensitive.
+    /// Returns None if the input does not match any unit.
+    pub fn try_from_input(input: &str) -> Option<Self> {
+        Self::value_variants()
+            .iter()
+            .find(|&&v| v.to_possible_value().unwrap().get_name() == input)
+            .copied()
+    }
+
+    /// Returns a vector of all available units
     pub fn get_all_units() -> Vec<Unit> {
         vec![
             Self::Celcius,

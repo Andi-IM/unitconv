@@ -20,10 +20,10 @@ pub enum Commands {
     Convert {
         /// Base Unit
         #[arg(long)]
-        from: Unit,
+        from: String,
         /// Target Unit
         #[arg(long)]
-        to: Unit,
+        to: String,
         /// Converting value
         #[arg(long)]
         value: f64,
@@ -35,10 +35,26 @@ pub enum Commands {
 }
 
 pub fn run(cli: Cli) -> Result<()> {
-    match cli.command {
-        Commands::Convert { from, to, value } => match from.convert(&to, value) {
-            Ok(result) => println!("{result}"),
-            Err(e) => eprintln!("Error: {e}"),
+    match &cli.command {
+        Commands::Convert { from, to, value } => {
+            let unit_from = match Unit::try_from_input(from) {
+                Some(u) => u,
+                None => {
+                    eprintln!("Error: [ERROR] Satuan asal '{}' tidak dikenali.", from);
+                    std::process::exit(1);
+                }
+            };
+            let unit_to = match Unit::try_from_input(to) {
+                Some(u) => u,
+                None => {
+                    eprintln!("Error: [ERROR] Satuan tujuan '{}' tidak dikenali.", to);
+                    std::process::exit(1);
+                }
+            };
+            match unit_from.convert(&unit_to, *value) {
+                Ok(result) => println!("{result}"),
+                Err(e) => eprintln!("Error: {e}"),
+            }
         },
         Commands::History => {
             let history = domain::records::load_history()?;
