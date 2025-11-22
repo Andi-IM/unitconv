@@ -1,5 +1,4 @@
 mod domain;
-use crate::domain::records::ConversionRecord;
 use crate::domain::units::Unit;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -40,7 +39,7 @@ pub fn run(cli: Cli) -> Result<()> {
             Err(e) => eprintln!("Error: {e}"),
         },
         Commands::History => {
-            let history = ConversionRecord::load_history()?;
+            let history = domain::records::load_history()?;
             println!("{history:?}");
         }
     }

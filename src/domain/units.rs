@@ -1,4 +1,6 @@
+use crate::domain::records::{ConversionRecord, save_to_history};
 use clap::ValueEnum;
+use std::fmt;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Category {
@@ -17,6 +19,12 @@ pub enum Unit {
     Inch,
     Km,
     Miles,
+}
+
+impl fmt::Display for Unit {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 impl Unit {
@@ -43,14 +51,25 @@ impl Unit {
             Category::Temperature => self.convert_temp(to, value),
             Category::Length => self.convert_length(to, value),
         };
-        // Format output with symbol
-        Ok(format!(
+        let display_text = format!(
             "{} {} = {} {}",
             value,
             Self::get_symbol(self),
             result,
             Self::get_symbol(to)
-        ))
+        );
+        let conversion_record = ConversionRecord {
+            from: self.to_string(),
+            to: to.to_string(),
+            value,
+            result,
+            display_text: display_text.clone(),
+        };
+        // Save to history
+        let _ = save_to_history(conversion_record);
+
+        // Format output with symbol
+        Ok(display_text)
     }
 
     // --- Logic Simbol Output ---
