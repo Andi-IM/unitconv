@@ -30,6 +30,8 @@ pub enum Commands {
     },
     /// Melihat riwayat konversi
     History,
+    /// Melihat daftar unit konversi yang didukung
+    List,
 }
 
 pub fn run(cli: Cli) -> Result<()> {
@@ -40,7 +42,17 @@ pub fn run(cli: Cli) -> Result<()> {
         },
         Commands::History => {
             let history = domain::records::load_history()?;
-            println!("{history:?}");
+            if history.is_empty() {
+                println!("Riwayat kosong.");
+            } else {
+                println!("Riwayat Konversi:");
+                for (idx, rec) in history.iter().enumerate() {
+                    println!("{}. {}", idx + 1, rec.display_text);
+                }
+            }
+        }
+        Commands::List => {
+            println!("{}", Unit::list_as_string());
         }
     }
     Ok(())

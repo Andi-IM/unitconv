@@ -11,6 +11,7 @@ pub enum Category {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
 pub enum Unit {
     // Temperature
+    #[value(alias = "celsius")] // alias ejaan baku
     Celcius,
     Fahrenheit,
     Kelvin,
@@ -28,6 +29,54 @@ impl fmt::Display for Unit {
 }
 
 impl Unit {
+    pub fn get_all_units() -> Vec<Unit> {
+        vec![
+            Self::Celcius,
+            Self::Fahrenheit,
+            Self::Kelvin,
+            Self::Cm,
+            Self::Inch,
+            Self::Km,
+            Self::Miles,
+        ]
+    }
+
+    /// Returns a formatted list of all units with numbering and category
+    pub fn list_as_string() -> String {
+        let units = Self::get_all_units();
+        let mut lines = Vec::new();
+        lines.push("Satuan yang didukung:".to_string());
+        for (idx, unit) in units.iter().enumerate() {
+            let category = match unit.get_category() {
+                Category::Temperature => "suhu",
+                Category::Length => "panjang",
+            };
+            let name = format!("{:?}", unit).to_lowercase();
+            lines.push(format!("{}. [{}] {}", idx + 1, category, name));
+        }
+        lines.join("\n")
+    }
+
+    /// Helper method to get a lowercase display name (correct spelling)
+    fn display_name(&self) -> &'static str {
+        match self {
+            Unit::Celcius => "celsius",
+            Unit::Fahrenheit => "fahrenheit",
+            Unit::Kelvin => "kelvin",
+            Unit::Cm => "cm",
+            Unit::Inch => "inch",
+            Unit::Km => "km",
+            Unit::Miles => "miles",
+        }
+    }
+
+    fn category_label(cat: &Category) -> &'static str {
+        match cat {
+            Category::Temperature => "suhu",
+            Category::Length => "panjang",
+        }
+    }
+
     /// Helper method to get the category of the unit
     pub fn get_category(&self) -> Category {
         match self {
@@ -41,9 +90,11 @@ impl Unit {
         // Validate Category
         if self.get_category() != to.get_category() {
             return Err(format!(
-                "Unit category mismatch: {:?} != {:?}",
-                self.get_category(),
-                to.get_category()
+                "[ERROR] Tidak dapat mengonversi satuan yang berbeda kategori: [{}] {} → [{}] {}",
+                Self::category_label(&self.get_category()),
+                self.display_name(),
+                Self::category_label(&to.get_category()),
+                to.display_name()
             ));
         }
         // Convert by category
