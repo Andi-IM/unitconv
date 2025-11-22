@@ -59,6 +59,39 @@ This project showcases several core concepts and libraries in the Rust ecosystem
   }
   ```
 
+- **Option Enum (`Some` & `None`)**  
+  Rust's `Option<T>` enum is used to represent a value that may or may not be present. `Some(T)` holds a value, while `None` indicates the absence of a value. This helps prevent null pointer exceptions common in other languages.
+
+  In this project, `Option` is used when parsing unit inputs:
+  ```rust
+  // src/domain/units.rs
+  pub fn try_from_input(input: &str) -> Option<Self> {
+      Self::value_variants()
+          .iter()
+          .find(|&&v| v.to_possible_value().unwrap().get_name() == input)
+          .copied()
+  }
+
+  // src/lib.rs (usage)
+  let unit_from = match Unit::try_from_input(from) {
+      Some(u) => u,
+      None => {
+          eprintln!("Error: [ERROR] Satuan asal '{}' tidak dikenali.", from);
+          std::process::exit(1);
+      }
+  };
+  ```
+
+- **Closures**  
+  Closures are anonymous functions that can capture values from their enclosing scope. They are often used for concise, inline operations.
+
+  Here, a closure is used with the `find` method to search for a matching unit:
+  ```rust
+  // src/domain/units.rs
+  // Inside try_from_input function
+  .find(|&&v| v.to_possible_value().unwrap().get_name() == input)
+  ```
+
 - **Error Handling & `anyhow`**  
   Error propagation with `Result` and early-return `?`.
 
