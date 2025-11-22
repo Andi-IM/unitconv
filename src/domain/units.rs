@@ -158,15 +158,15 @@ impl Unit {
         let cm = match self {
             Unit::Cm => val,
             Unit::Inch => val * 2.54,
-            Unit::Km => val * 1000.0,
-            Unit::Miles => val * 1609.34,
+            Unit::Km => val * 100000.0,
+            Unit::Miles => val * 160934.4,
             _ => val,
         };
         match to {
             Unit::Cm => cm,
             Unit::Inch => cm / 2.54,
-            Unit::Km => cm / 1000.0,
-            Unit::Miles => cm / 1609.34,
+            Unit::Km => cm / 100000.0,
+            Unit::Miles => cm / 160934.4,
             _ => cm,
         }
     }
