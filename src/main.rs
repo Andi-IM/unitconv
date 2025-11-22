@@ -1,5 +1,5 @@
 use clap::Parser;
-use unitconv::{run, Cli};
+use unitconv::{Cli, run};
 
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();

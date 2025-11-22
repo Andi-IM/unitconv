@@ -14,9 +14,9 @@ pub struct ConversionRecord {
 const FILE_PATH: &'static str = "conversion.json";
 
 /// Loads conversion history from a JSON file
-/// 
+///
 /// # Returns
-/// 
+///
 /// A vector of ConversionRecord structs if successful, or an error if the file cannot be read.
 pub fn load_history() -> Result<Vec<ConversionRecord>, std::io::Error> {
     if !Path::new(FILE_PATH).exists() {
@@ -28,13 +28,13 @@ pub fn load_history() -> Result<Vec<ConversionRecord>, std::io::Error> {
 }
 
 /// Saves a conversion record to the history file
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `record` - The ConversionRecord struct to be saved.
-/// 
+///
 /// # Returns
-/// 
+///
 /// Ok(()) if successful, or an error if the file cannot be written.
 pub fn save_to_history(record: ConversionRecord) -> Result<(), std::io::Error> {
     let mut records: Vec<ConversionRecord> = load_history()?;

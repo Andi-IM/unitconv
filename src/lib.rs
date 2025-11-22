@@ -55,7 +55,7 @@ pub fn run(cli: Cli) -> Result<()> {
                 Ok(result) => println!("{result}"),
                 Err(e) => eprintln!("Error: {e}"),
             }
-        },
+        }
         Commands::History => {
             let history = domain::records::load_history()?;
             if history.is_empty() {

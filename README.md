@@ -27,15 +27,16 @@ This project showcases several core concepts and libraries in the Rust ecosystem
   Using the `ValueEnum` derive macro from the `clap` crate to map CLI arguments directly to enums.
 
   ```rust
-  #[derive(Copy, Clone, ValueEnum, Debug)]
+  #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
   pub enum Unit {
       #[value(alias = "celsius")] Celcius,
       Fahrenheit,
       Kelvin,
       Cm,
+      Inch,
       Km,
-  }
-  ```
+      Miles,
+  }  ```
 
 - **Pattern Matching & Method Dispatch**  
   Unit-to-unit conversion uses pattern matching on unit categories.
@@ -103,7 +104,7 @@ This project showcases several core concepts and libraries in the Rust ecosystem
   ```rust
   #[derive(Subcommand)]
   pub enum Commands {
-      Convert { #[arg(long)] from: Unit, #[arg(long)] to: Unit, #[arg(long)] value: f64 },
+      Convert { #[arg(long)] from: String, #[arg(long)] to: String, #[arg(long)] value: f64 },
       History,
       List,
   }
