@@ -1,3 +1,5 @@
+use std::{fs, path::Path};
+
 use unitconv::domain::{records::{ConversionRecord, load_history, save_to_history}, units::Unit};
 
 #[test]
@@ -128,11 +130,17 @@ fn test_category_mismatch_error() {
 
 #[test]
 fn test_is_data_saved() {
+    // remove conversion.json if it exists
+    const FILE_PATH: &str = "conversion.json";
+    if Path::new(FILE_PATH).exists() {
+        fs::remove_file(FILE_PATH).unwrap();
+    }
+
     let record = ConversionRecord {
-        value: 10.0,
-        result: 27.94,
         from: "cm".to_owned(),
         to: "inch".to_owned(),
+        value: 10.0,
+        result: 27.94,
         display_text: "10 cm = 27.94 inch".to_string(),
     };
     let _ = save_to_history(record.clone());
