@@ -28,6 +28,11 @@ impl fmt::Display for Unit {
     }
 }
 
+fn round(value: f64, decimals: u32) -> f64 {
+    let factor = 10f64.powi(decimals as i32);
+    (value * factor).round() / factor    
+}
+
 impl Unit {
     /// Converts a string input to a Unit variant, case-insensitive.
     /// Returns None if the input does not match any unit.
@@ -116,14 +121,14 @@ impl Unit {
             "{} {} = {} {}",
             value,
             Self::get_symbol(self),
-            result,
+            round(result, 2),
             Self::get_symbol(to)
         );
         let conversion_record = ConversionRecord {
             from: self.to_string(),
             to: to.to_string(),
             value,
-            result,
+            result: round(result, 2),
             display_text: display_text.clone(),
         };
         // Save to history
@@ -148,7 +153,7 @@ impl Unit {
 
     /// Convert temperature unit (Basis: Celcius)
     fn convert_temp(&self, to: &Unit, val: f64) -> f64 {
-        let celcius = match self {
+        let celcius: f64 = match self {
             Unit::Celcius => val,
             Unit::Fahrenheit => (val - 32.0) * 5.0 / 9.0,
             Unit::Kelvin => val - 273.15,
