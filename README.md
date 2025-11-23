@@ -203,6 +203,18 @@ In short, this project exemplifies Rust’s core principles:
 • Data is persisted via *ownership transfer*, ensuring no dangling references to moved memory.  
 These practices keep memory safe while maintaining performance.
 
+# Rust Testing
+
+This project uses Rust's built-in testing framework, `cargo test`, to ensure the correctness of its components. The tests are located in the `tests` directory and cover various aspects of the application, including unit tests, integration tests, and end-to-end tests.
+
+To run the tests, simply execute the following command in the project root directory:
+
+```bash
+cargo test -- --test-threads=1 # parallel test will cause error so make sure to run it with single thread
+```
+
+This will compile the tests and run them, displaying the results in the terminal.
+
 # Acknowledgements
 
 - **Rust Documentation**  

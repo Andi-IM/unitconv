@@ -7,7 +7,7 @@ use unitconv::domain::{
 use serial_test::serial;
 
 fn init_test_env() {
-    // Create a temprorary file that will ac as the history storage.
+    // Create a temprorary file that will act as the history storage.
     // We convert it into a TempPath se we can take ownership of the path independent of the
     // file handle, then call `keep` to prevent the file from being deleted when the TempPath
     // goes out of scope. This guarantees the file lives for the entire duration of the test
