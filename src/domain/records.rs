@@ -22,7 +22,14 @@ pub fn load_history() -> Result<Vec<ConversionRecord>, std::io::Error> {
     if !Path::new(FILE_PATH).exists() {
         return Ok(Vec::new());
     }
-    let data = fs::read_to_string(FILE_PATH)?;
+    // Try to read file as UTF-8 string; if encoding error, treat as empty history
+    let data = match fs::read_to_string(FILE_PATH) {
+        Ok(s) => s,
+        Err(e) if e.kind() == std::io::ErrorKind::InvalidData => {
+            return Ok(Vec::new());
+        }
+        Err(e) => return Err(e),
+    };
     let records: Vec<ConversionRecord> = serde_json::from_str(&data).unwrap_or_else(|_| Vec::new());
     Ok(records)
 }
