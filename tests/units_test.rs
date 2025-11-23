@@ -69,6 +69,13 @@ fn test_fahrenheit_celcius_2() {
 }
 
 #[test]
+fn test_kelvin_fahrenheit(){
+    init_test_env();
+    let result = Unit::Kelvin.convert(&Unit::Fahrenheit, 422.0).unwrap();
+    assert_eq!(result, "422 K = 299.93 °F");
+}
+
+#[test]
 fn test_kelvin_celcius_1() {
     init_test_env();
     let result = Unit::Kelvin.convert(&Unit::Celsius, 66.0).unwrap();
