@@ -1,7 +1,7 @@
 pub mod domain;
-use crate::domain::units::Unit;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use domain::{records::load_history, units::Unit};
 
 #[derive(Parser)]
 #[command(
@@ -57,7 +57,7 @@ pub fn run(cli: Cli) -> Result<()> {
             }
         }
         Commands::History => {
-            let history = domain::records::load_history()?;
+            let history = load_history()?;
             if history.is_empty() {
                 println!("Riwayat kosong.");
             } else {

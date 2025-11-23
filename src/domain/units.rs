@@ -132,7 +132,7 @@ impl Unit {
             display_text: display_text.clone(),
         };
         // Save to history
-        let _ = save_to_history(conversion_record);
+        let _ = save_to_history( conversion_record);
 
         // Format output with symbol
         Ok(display_text)

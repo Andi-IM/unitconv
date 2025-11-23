@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::Path;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ConversionRecord {
@@ -11,7 +10,13 @@ pub struct ConversionRecord {
     pub display_text: String,
 }
 
-const FILE_PATH: &'static str = "conversion.json";
+pub const DEFAULT_FILE_PATH: &'static str = "conversion.json";
+
+fn history_path() -> std::path::PathBuf {
+    std::env::var("UNITCONV_HISTORY_PATH")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| std::path::PathBuf::from(DEFAULT_FILE_PATH))
+}
 
 /// Loads conversion history from a JSON file
 ///
@@ -19,11 +24,12 @@ const FILE_PATH: &'static str = "conversion.json";
 ///
 /// A vector of ConversionRecord structs if successful, or an error if the file cannot be read.
 pub fn load_history() -> Result<Vec<ConversionRecord>, std::io::Error> {
-    if !Path::new(FILE_PATH).exists() {
+    let file_path = history_path();
+    if !file_path.exists() {
         return Ok(Vec::new());
     }
     // Try to read file as UTF-8 string; if encoding error, treat as empty history
-    let data = match fs::read_to_string(FILE_PATH) {
+    let data = match fs::read_to_string(&file_path) {
         Ok(s) => s,
         Err(e) if e.kind() == std::io::ErrorKind::InvalidData => {
             return Ok(Vec::new());
@@ -47,6 +53,6 @@ pub fn save_to_history(record: ConversionRecord) -> Result<(), std::io::Error> {
     let mut records: Vec<ConversionRecord> = load_history()?;
     records.push(record);
     let json_string = serde_json::to_string_pretty(&records)?;
-    fs::write(FILE_PATH, json_string)?;
+    fs::write(history_path(), json_string)?;
     Ok(())
 }
