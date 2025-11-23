@@ -11,8 +11,7 @@ pub enum Category {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
 pub enum Unit {
     // Temperature
-    #[value(alias = "celsius")] // alias ejaan baku
-    Celcius,
+    Celsius,
     Fahrenheit,
     Kelvin,
     // Length
@@ -46,7 +45,7 @@ impl Unit {
     /// Returns a vector of all available units
     pub fn get_all_units() -> Vec<Unit> {
         vec![
-            Self::Celcius,
+            Self::Celsius,
             Self::Fahrenheit,
             Self::Kelvin,
             Self::Cm,
@@ -75,7 +74,7 @@ impl Unit {
     /// Helper method to get a lowercase display name (correct spelling)
     fn display_name(&self) -> &'static str {
         match self {
-            Unit::Celcius => "celsius",
+            Unit::Celsius => "celsius",
             Unit::Fahrenheit => "fahrenheit",
             Unit::Kelvin => "kelvin",
             Unit::Cm => "cm",
@@ -95,7 +94,7 @@ impl Unit {
     /// Helper method to get the category of the unit
     pub fn get_category(&self) -> Category {
         match self {
-            Self::Celcius | Self::Fahrenheit | Self::Kelvin => Category::Temperature,
+            Self::Celsius | Self::Fahrenheit | Self::Kelvin => Category::Temperature,
             Self::Cm | Self::Inch | Self::Km | Self::Miles => Category::Length,
         }
     }
@@ -114,25 +113,25 @@ impl Unit {
         }
         // Convert by category
         let result = match self.get_category() {
-            Category::Temperature => self.convert_temp(to, value),
-            Category::Length => self.convert_length(to, value),
+            Category::Temperature => round(self.convert_temp(to, value), 0),
+            Category::Length => round(self.convert_length(to, value), 4),
         };
         let display_text = format!(
             "{} {} = {} {}",
             value,
             Self::get_symbol(self),
-            round(result, 2),
+            result,
             Self::get_symbol(to)
         );
         let conversion_record = ConversionRecord {
             from: self.display_name().to_string(),
             to: to.display_name().to_string(),
             value,
-            result: round(result, 2),
+            result,
             display_text: display_text.clone(),
         };
         // Save to history
-        let _ = save_to_history( conversion_record);
+        let _ = save_to_history(conversion_record);
 
         // Format output with symbol
         Ok(display_text)
@@ -141,7 +140,7 @@ impl Unit {
     // --- Logic Simbol Output ---
     fn get_symbol(unit: &Unit) -> String {
         match unit {
-            Unit::Celcius => "°C".to_string(),
+            Unit::Celsius => "°C".to_string(),
             Unit::Fahrenheit => "°F".to_string(),
             Unit::Kelvin => "K".to_string(),
             Unit::Cm => "cm".to_string(),
@@ -153,18 +152,18 @@ impl Unit {
 
     /// Convert temperature unit (Basis: Celcius)
     fn convert_temp(&self, to: &Unit, val: f64) -> f64 {
-        let celcius: f64 = match self {
-            Unit::Celcius => val,
+        let celsius: f64 = match self {
+            Unit::Celsius => val,
             Unit::Fahrenheit => (val - 32.0) * 5.0 / 9.0,
             Unit::Kelvin => val - 273.15,
             _ => val,
         };
 
         match to {
-            Unit::Celcius => celcius,
-            Unit::Fahrenheit => (celcius * 9.0 / 5.0) + 32.0,
-            Unit::Kelvin => celcius + 273.15,
-            _ => celcius,
+            Unit::Celsius => celsius,
+            Unit::Fahrenheit => (celsius * 9.0 / 5.0) + 32.0,
+            Unit::Kelvin => celsius + 273.15,
+            _ => celsius,
         }
     }
 
