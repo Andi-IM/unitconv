@@ -1,3 +1,5 @@
+[![Rust](https://github.com/Andi-IM/unitconv/actions/workflows/rust.yml/badge.svg)](https://github.com/Andi-IM/unitconv/actions/workflows/rust.yml)
+
 # Unit Conversion
 
 A unit converter developed to understand how Rust programs work.
