@@ -1,4 +1,4 @@
-use unitconv::domain::units::Unit;
+use unitconv::domain::{records::{ConversionRecord, load_history, save_to_history}, units::Unit};
 
 #[test]
 fn test_celcius_fahrenheit_1() {
@@ -124,4 +124,25 @@ fn test_miles_km() {
 fn test_category_mismatch_error() {
     let err = Unit::Cm.convert(&Unit::Celcius, 1.0).unwrap_err();
     assert!(err.contains("Tidak dapat mengonversi satuan yang berbeda kategori"));
+}
+
+#[test]
+fn test_is_data_saved() {
+    let record = ConversionRecord {
+        value: 10.0,
+        result: 27.94,
+        from: "cm".to_owned(),
+        to: "inch".to_owned(),
+        display_text: "10 cm = 27.94 inch".to_string(),
+    };
+    let _ = save_to_history(record.clone());
+    let history = load_history();
+    let history_vec = history.unwrap();
+    assert!(history_vec.iter().any(|h| 
+        h.value == record.value &&
+        h.result == record.result &&
+        h.from == record.from &&
+        h.to == record.to &&
+        h.display_text == record.display_text
+    ));
 }

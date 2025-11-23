@@ -125,8 +125,8 @@ impl Unit {
             Self::get_symbol(to)
         );
         let conversion_record = ConversionRecord {
-            from: self.to_string(),
-            to: to.to_string(),
+            from: self.display_name().to_string(),
+            to: to.display_name().to_string(),
             value,
             result: round(result, 2),
             display_text: display_text.clone(),
