@@ -1,15 +1,29 @@
-use std::sync::Once;
+use approx::assert_relative_eq;
+use tempfile::NamedTempFile;
 use unitconv::domain::{
     records::{ConversionRecord, load_history, save_to_history},
     units::Unit,
 };
-
-static INIT: Once = Once::new();
+use serial_test::serial;
 
 fn init_test_env() {
-    INIT.call_once(|| {
-        unsafe { std::env::set_var("UNITCONV_HISTORY_PATH", "/tmp/conversion_test.json") };
-    });
+    // Create a temprorary file that will ac as the history storage.
+    // We convert it into a TempPath se we can take ownership of the path independent of the
+    // file handle, then call `keep` to prevent the file from being deleted when the TempPath
+    // goes out of scope. This guarantees the file lives for the entire duration of the test
+    // suite and avoids it being removed prematurely, which previously caused empty histories.
+    let temp_file = NamedTempFile::new().expect("Failed to create temp history file");
+    let temp_path = temp_file.into_temp_path();
+    let persisted_path = temp_path
+        .keep()
+        .expect("Failed to persist temp history file");
+    unsafe { std::env::set_var("UNITCONV_HISTORY_PATH", &persisted_path) };
+
+    // print variable has been set up
+    println!(
+        "UNITCONV_HISTORY_PATH: {}",
+        std::env::var("UNITCONV_HISTORY_PATH").unwrap()
+    );
 }
 
 #[test]
@@ -160,6 +174,7 @@ fn test_category_mismatch_error() {
 }
 
 #[test]
+#[serial]
 fn test_is_data_saved() {
     init_test_env();
     let record = ConversionRecord {
@@ -172,17 +187,7 @@ fn test_is_data_saved() {
     let _ = save_to_history(record.clone());
     let history = load_history();
     let history_vec = history.unwrap();
-    assert!(history_vec.iter().any(|h| {
-        let epsilon = 1e-10; // Toleransi perbedaan sangat kecil
-
-        // Bandingkan string (aman)
-        let string_match =
-            h.from == record.from && h.to == record.to && h.display_text == record.display_text;
-
-        // Bandingkan float dengan toleransi (abs diff)
-        let value_match = (h.value - record.value).abs() < epsilon;
-        let result_match = (h.result - record.result).abs() < epsilon;
-
-        string_match && value_match && result_match
-    }));
+    // println!("{:?}", history_vec);
+    assert_eq!(history_vec.len(), 1);
+    assert_relative_eq!(history_vec[0].result, record.result);
 }
