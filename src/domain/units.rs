@@ -27,12 +27,13 @@ impl fmt::Display for Unit {
     }
 }
 
-fn round(value: f64, decimals: u32) -> f64 {
-    let factor = 10f64.powi(decimals as i32);
-    (value * factor).round() / factor    
-}
-
 impl Unit {
+    /// Rounds a floating-point number to a specified number of decimal places.
+    fn round(value: f64, decimals: u32) -> f64 {
+        let factor = 10f64.powi(decimals as i32);
+        (value * factor).round() / factor
+    }
+
     /// Converts a string input to a Unit variant, case-insensitive.
     /// Returns None if the input does not match any unit.
     pub fn try_from_input(input: &str) -> Option<Self> {
@@ -113,8 +114,14 @@ impl Unit {
         }
         // Convert by category
         let result = match self.get_category() {
-            Category::Temperature => round(self.convert_temp(to, value), 0),
-            Category::Length => round(self.convert_length(to, value), 4),
+            Category::Temperature => {
+                let result = self.convert_temp(to, value);
+                Self::round(result, 2).to_string()
+            }
+            Category::Length => {
+                let converted = self.convert_length(to, value);
+                Self::round(converted, 4).to_string()
+            }
         };
         let display_text = format!(
             "{} {} = {} {}",
@@ -127,7 +134,7 @@ impl Unit {
             from: self.display_name().to_string(),
             to: to.display_name().to_string(),
             value,
-            result,
+            result: result.parse().unwrap(),
             display_text: display_text.clone(),
         };
         // Save to history
@@ -150,20 +157,20 @@ impl Unit {
         }
     }
 
-    /// Convert temperature unit (Basis: Celcius)
+    /// Convert temperature unit (Basis: Kelvin)
     fn convert_temp(&self, to: &Unit, val: f64) -> f64 {
-        let celsius: f64 = match self {
-            Unit::Celsius => val,
-            Unit::Fahrenheit => (val - 32.0) * 5.0 / 9.0,
-            Unit::Kelvin => val - 273.15,
+        let kelvin: f64 = match self {
+            Unit::Celsius => val + 273.15,
+            Unit::Fahrenheit => (val + 459.67) * 5.0 / 9.0,
+            Unit::Kelvin => val,
             _ => val,
         };
 
         match to {
-            Unit::Celsius => celsius,
-            Unit::Fahrenheit => (celsius * 9.0 / 5.0) + 32.0,
-            Unit::Kelvin => celsius + 273.15,
-            _ => celsius,
+            Unit::Celsius => kelvin - 273.15,
+            Unit::Fahrenheit => kelvin * 9.0 / 5.0 - 459.67,
+            Unit::Kelvin => kelvin,
+            _ => kelvin,
         }
     }
 
@@ -172,8 +179,8 @@ impl Unit {
         let cm = match self {
             Unit::Cm => val,
             Unit::Inch => val * 2.54,
-            Unit::Km => val * 100000.0,
-            Unit::Miles => val * 160934.4,
+            Unit::Km => val * 100_000.0,
+            Unit::Miles => val * 160_934.4,
             _ => val,
         };
         match to {

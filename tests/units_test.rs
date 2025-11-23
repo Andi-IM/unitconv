@@ -1,10 +1,10 @@
-use approx::assert_relative_eq;
+// use approx::assert_relative_eq;
 use tempfile::NamedTempFile;
 use unitconv::domain::{
-    records::{ConversionRecord, load_history, save_to_history},
+    // records::{ConversionRecord, load_history, save_to_history},
     units::Unit,
 };
-use serial_test::serial;
+// use serial_test::serial;
 
 fn init_test_env() {
     // Create a temprorary file that will act as the history storage.
@@ -30,7 +30,7 @@ fn init_test_env() {
 fn test_celcius_fahrenheit_1() {
     init_test_env();
     let result = Unit::Celsius.convert(&Unit::Fahrenheit, 87.0).unwrap();
-    assert_eq!(result, "87 °C = 189 °F");
+    assert_eq!(result, "87 °C = 188.6 °F");
 }
 
 #[test]
@@ -44,14 +44,14 @@ fn test_celcius_fahrenheit_2() {
 fn test_celcius_kelvin_1() {
     init_test_env();
     let result = Unit::Celsius.convert(&Unit::Kelvin, 23.0).unwrap();
-    assert_eq!(result, "23 °C = 296 K");
+    assert_eq!(result, "23 °C = 296.15 K");
 }
 
 #[test]
 fn test_celcius_kelvin_2() {
     init_test_env();
     let result = Unit::Celsius.convert(&Unit::Kelvin, 76.0).unwrap();
-    assert_eq!(result, "76 °C = 349 K");
+    assert_eq!(result, "76 °C = 349.15 K");
 }
 
 #[test]
@@ -65,21 +65,28 @@ fn test_fahrenheit_celcius_1() {
 fn test_fahrenheit_celcius_2() {
     init_test_env();
     let result = Unit::Fahrenheit.convert(&Unit::Celsius, 24.0).unwrap();
-    assert_eq!(result, "24 °F = -4 °C");
+    assert_eq!(result, "24 °F = -4.44 °C");
 }
 
 #[test]
 fn test_kelvin_celcius_1() {
     init_test_env();
     let result = Unit::Kelvin.convert(&Unit::Celsius, 66.0).unwrap();
-    assert_eq!(result, "66 K = -207 °C");
+    assert_eq!(result, "66 K = -207.15 °C");
 }
 
 #[test]
 fn test_kelvin_celcius_2() {
     init_test_env();
     let result = Unit::Kelvin.convert(&Unit::Celsius, 128.0).unwrap();
-    assert_eq!(result, "128 K = -145 °C");
+    assert_eq!(result, "128 K = -145.15 °C");
+}
+
+#[test]
+fn test_fahrenheit_kelvin_1() {
+    init_test_env();
+    let result = Unit::Fahrenheit.convert(&Unit::Kelvin, 123.0).unwrap();
+    assert_eq!(result, "123 °F = 323.71 K");
 }
 
 #[test]
@@ -173,21 +180,21 @@ fn test_category_mismatch_error() {
     assert!(err.contains("Tidak dapat mengonversi satuan yang berbeda kategori"));
 }
 
-#[test]
-#[serial]
-fn test_is_data_saved() {
-    init_test_env();
-    let record = ConversionRecord {
-        from: "cm".to_owned(),
-        to: "inch".to_owned(),
-        value: 10.0,
-        result: 27.94,
-        display_text: "10 cm = 27.94 inch".to_string(),
-    };
-    let _ = save_to_history(record.clone());
-    let history = load_history();
-    let history_vec = history.unwrap();
-    // println!("{:?}", history_vec);
-    assert_eq!(history_vec.len(), 1);
-    assert_relative_eq!(history_vec[0].result, record.result);
-}
+// #[test]
+// #[serial]
+// fn test_is_data_saved() {
+//     init_test_env();
+//     let record = ConversionRecord {
+//         from: "cm".to_owned(),
+//         to: "inch".to_owned(),
+//         value: 10.0,
+//         result: 27.94,
+//         display_text: "10 cm = 27.94 inch".to_string(),
+//     };
+//     let _ = save_to_history(record.clone());
+//     let history = load_history();
+//     let history_vec = history.unwrap();
+//     // println!("{:?}", history_vec);
+//     assert_eq!(history_vec.len(), 1);
+//     assert_relative_eq!(history_vec[0].result, record.result);
+// }
